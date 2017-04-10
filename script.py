@@ -8,11 +8,13 @@ from pathlib import Path, PurePath
 parser = argparse.ArgumentParser()
 parser.add_argument('database_url', metavar='DATABASE_URL', type=str)
 parser.add_argument('s3_path', metavar='BUCKET:PREFIX', type=str)
+parser.add_argument('--postfix', type=str, default='dump')
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    bucket, prefix = args.s3_path.split(':', 1)
-    filename = '{}.dump'.format(datetime.date.today().isoformat())
+    bucket, prefix, *_rest = args.s3_path.split(':', 1) + [None]
+    postfix = args.postfix
+    filename = '{}.{}'.format(datetime.date.today().isoformat(), postfix)
     filepath = Path('/out') / filename
     subprocess.check_call(
         [
